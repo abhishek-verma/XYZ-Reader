@@ -5,11 +5,14 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,17 +24,30 @@ import com.example.xyzreader.data.ItemsContract;
 
 public class ViewPagerFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, ArticleListActivity.ArticleChangeListener {
-    private long mStartId;
+    private static final String LOG_TAG = ViewPagerFragment.class.getSimpleName();
+    private long mStartId = 1;
 
-    private long mSelectedItemId;
+    private long mSelectedItemId = 0;
 //    private int mSelectedItemUpButtonFloor = Integer.MAX_VALUE;
 
     private MyPagerAdapter mPagerAdapter;
-    private UpButtonCallbacks mUpButtonCallbacksReceiver = null;
     private ViewPager mPager;
+    private boolean mTwoPane;
 
     public ViewPagerFragment() {
         // Required empty public constructor
+    }
+
+
+    @Override
+    public void onInflate(Context context, AttributeSet attrs, Bundle savedInstanceState) {
+        super.onInflate(context, attrs, savedInstanceState);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ArticleDetailFragment);
+
+        mTwoPane = a.getBoolean(R.styleable.ArticleDetailFragment_twoPane, false);
+
+        a.recycle();
     }
 
 
@@ -42,7 +58,6 @@ public class ViewPagerFragment extends Fragment
         if (savedInstanceState == null) {
             if (getActivity().getIntent() != null && getActivity().getIntent().getData() != null) {
                 mStartId = ItemsContract.Items.getItemId(getActivity().getIntent().getData());
-                mSelectedItemId = mStartId;
             }
         }
     }
@@ -51,7 +66,6 @@ public class ViewPagerFragment extends Fragment
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        setUpButtonCallbackReceiver(context);
     }
 
     @Override
@@ -62,15 +76,7 @@ public class ViewPagerFragment extends Fragment
 
         getLoaderManager().initLoader(0, null, this);
 
-        mPagerAdapter = new MyPagerAdapter(getFragmentManager(),
-                new MyPagerAdapter.MyPagerAdapterListener() {
-                    @Override
-                    public void onFragmentFloorReceived(int selectedItemUpButtonFloor) {
-                        if (mUpButtonCallbacksReceiver != null) {
-                            mUpButtonCallbacksReceiver.upButtonFloorReceived(selectedItemUpButtonFloor);
-                        }
-                    }
-                });
+        mPagerAdapter = new MyPagerAdapter(getFragmentManager(), mTwoPane);
         mPager = (ViewPager) rootView.findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
         mPager.setPageMargin((int) TypedValue
@@ -79,14 +85,7 @@ public class ViewPagerFragment extends Fragment
                         getResources().getDisplayMetrics()));//Margin between two pages
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                super.onPageScrollStateChanged(state);
-                if (mUpButtonCallbacksReceiver != null) {
-                    mUpButtonCallbacksReceiver.onPageScrollStateChanged(state);
-                }
-            }
+        mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
             @Override
             public void onPageSelected(int position) {
@@ -95,8 +94,6 @@ public class ViewPagerFragment extends Fragment
 
                     mSelectedItemId = mPagerAdapter.mCursor.getLong(ArticleLoader.Query._ID);
                 }
-                if (mUpButtonCallbacksReceiver != null)
-                    mUpButtonCallbacksReceiver.onPositionObsolete();
             }
         });
 
@@ -112,29 +109,35 @@ public class ViewPagerFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.d(LOG_TAG, "onLoadFinished abhi: mSelectedId: " + mSelectedItemId + "startId: " + mStartId);
+
         mPagerAdapter.mCursor = cursor;
         mPagerAdapter.notifyDataSetChanged();
+
 
         // Select the start ID
         if (mStartId > 0) {
             mPagerAdapter.mCursor.moveToFirst();
             // TODO: optimize
-//            while (!mPagerAdapter.mCursor.isAfterLast()) {
-//                if (mPagerAdapter.mCursor.getLong(ArticleLoader.Query._ID) == mStartId) {
-//                    final int position = mPagerAdapter.mCursor.getPosition();
-//                    mPager.setCurrentItem(position, false);
-//                    break;
-//                }
-//                mPagerAdapter.mCursor.moveToNext();
-//            }
-
-            mPagerAdapter.mCursor.moveToPosition((int) mStartId);
-            final int position = mPagerAdapter.mCursor.getPosition();
-            mPager.setCurrentItem(position, false);
-
+            while (!mPagerAdapter.mCursor.isAfterLast()) {
+                if (mPagerAdapter.mCursor.getLong(ArticleLoader.Query._ID) == mStartId) {
+                    final int position = mPagerAdapter.mCursor.getPosition();
+                    mPager.setCurrentItem(position, false);
+                    break;
+                }
+                mPagerAdapter.mCursor.moveToNext();
+            }
             mStartId = 0;
-
         }
+
+//        // Select the start ID
+//        if (mStartId >= 0) {
+//            mPagerAdapter.mCursor.moveToFirst();
+//
+//            mPagerAdapter.mCursor.moveToPosition((int) mStartId);
+//            final int position = mPagerAdapter.mCursor.getPosition();
+//            mPager.setCurrentItem(position, false);
+//        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().startPostponedEnterTransition();
@@ -147,23 +150,10 @@ public class ViewPagerFragment extends Fragment
         mPagerAdapter.notifyDataSetChanged();
     }
 
-    public void setUpButtonCallbackReceiver(Context activity) {
-        if (activity instanceof UpButtonCallbacks) {
-            mUpButtonCallbacksReceiver = (UpButtonCallbacks) activity;
-        }
-    }
 
     @Override
     public void onPageChanged(int position) {
         mPager.setCurrentItem(position, true);
-    }
-
-    public interface UpButtonCallbacks {
-        void onPositionObsolete();
-
-        void upButtonFloorReceived(int selectedItemUpButtonFloor);
-
-        void onPageScrollStateChanged(int state);
     }
 
 }

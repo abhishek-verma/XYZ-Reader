@@ -16,16 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemsProvider extends ContentProvider {
-	private SQLiteOpenHelper mOpenHelper;
-
-	interface Tables {
-		String ITEMS = "items";
-	}
-
 	private static final int ITEMS = 0;
 	private static final int ITEMS__ID = 1;
-
 	private static final UriMatcher sUriMatcher = buildUriMatcher();
+	private SQLiteOpenHelper mOpenHelper;
 
 	private static UriMatcher buildUriMatcher() {
 		final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -135,9 +129,14 @@ public class ItemsProvider extends ContentProvider {
                 results[i] = operations.get(i).apply(this, results, i);
             }
             db.setTransactionSuccessful();
-            return results;
+//			getContext().getContentResolver().notifyChange(ItemsContract.Items.buildDirUri(), null);
+			return results;
         } finally {
             db.endTransaction();
         }
     }
+
+	interface Tables {
+		String ITEMS = "items";
+	}
 }

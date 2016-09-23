@@ -18,13 +18,14 @@ package com.example.xyzreader.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 /**
  * A simple {@link LinearLayout} subclass that has a maxWidth
  */
-public class MaxWidthLinearLayout extends LinearLayout {
+public class MaxWidthLinearLayout extends NestedScrollView {
     private static final int[] ATTRS = {
             android.R.attr.maxWidth
     };
@@ -46,10 +47,6 @@ public class MaxWidthLinearLayout extends LinearLayout {
         init(context, attrs, defStyle, 0);
     }
 
-    public MaxWidthLinearLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init(context, attrs, defStyleAttr, defStyleRes);
-    }
 
     public void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         TypedArray a = context.obtainStyledAttributes(attrs, ATTRS);
