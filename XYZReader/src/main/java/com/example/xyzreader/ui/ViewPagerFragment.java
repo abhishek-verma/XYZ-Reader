@@ -33,6 +33,7 @@ public class ViewPagerFragment extends Fragment
     private MyPagerAdapter mPagerAdapter;
     private ViewPager mPager;
     private boolean mTwoPane;
+    private ViewPager.SimpleOnPageChangeListener mSimpleOnPageChangeListener;
 
     public ViewPagerFragment() {
         // Required empty public constructor
@@ -85,7 +86,7 @@ public class ViewPagerFragment extends Fragment
                         getResources().getDisplayMetrics()));//Margin between two pages
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
-        mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        mSimpleOnPageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
 
             @Override
             public void onPageSelected(int position) {
@@ -95,11 +96,19 @@ public class ViewPagerFragment extends Fragment
                     mSelectedItemId = mPagerAdapter.mCursor.getLong(ArticleLoader.Query._ID);
                 }
             }
-        });
+        };
 
-
+        mPager.addOnPageChangeListener(mSimpleOnPageChangeListener);
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mPager != null && mSimpleOnPageChangeListener != null)
+            mPager.removeOnPageChangeListener(mSimpleOnPageChangeListener);
     }
 
     @Override
