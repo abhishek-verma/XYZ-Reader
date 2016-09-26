@@ -18,7 +18,7 @@ import com.example.xyzreader.data.UpdaterService;
  * activity presents a grid of items as cards.
  */
 public class ArticleListActivity extends AppCompatActivity implements
-        ArticleListFragment.OnFragmentInteractionListener {
+        ArticleListFragment.ListFragmentCallbacksListener {
 
     private Toolbar mToolbar;
 

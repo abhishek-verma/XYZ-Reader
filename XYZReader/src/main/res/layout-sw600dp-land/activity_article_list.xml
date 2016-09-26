@@ -1,80 +1,86 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/list_fragment"
-        android:name="com.example.xyzreader.ui.ArticleListFragment"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_alignEnd="@+id/center_view"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/center_view"
-        android:layout_below="@+id/appbar"
-        tools:layout="@layout/fragment_article_list" />
-
-
-    <android.support.v4.widget.Space
-        android:id="@+id/center_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_centerInParent="true" />
-
-
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:background="?colorPrimary"
-        android:elevation="8dp"
-        android:gravity="bottom|start">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="@dimen/list_toolbar_side_margin"
-            android:layout_marginLeft="@dimen/list_toolbar_side_margin"
-            android:layout_marginRight="@dimen/list_toolbar_side_margin">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|start"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/logo" />
-
-        </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
-
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/center_view"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/center_view"
-        android:layout_alignTop="@id/toolbar_container"
-        android:layout_marginEnd="@dimen/list_side_margin"
-        android:layout_marginRight="@dimen/list_side_margin"
-        android:layout_marginTop="20dp"
-        android:background="#fff"
-        android:elevation="10dp">
+        android:layout_height="match_parent">
 
         <fragment
-            android:id="@+id/view_pager_fragment"
-            android:name="com.example.xyzreader.ui.ViewPagerFragment"
-            android:layout_width="match_parent"
+            android:id="@+id/list_fragment"
+            android:name="com.example.xyzreader.ui.ArticleListFragment"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            app:twoPane="true"
-            tools:layout="@layout/fragment_article_detail" />
-    </FrameLayout>
+            android:layout_alignEnd="@+id/center_view"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/center_view"
+            android:layout_below="@+id/appbar"
+            tools:layout="@layout/fragment_article_list" />
 
-</RelativeLayout>
+
+        <android.support.v4.widget.Space
+            android:id="@+id/center_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerInParent="true" />
+
+
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="?colorPrimary"
+            android:elevation="@dimen/appbar_elevation"
+            android:gravity="bottom|start">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="@dimen/list_toolbar_side_margin"
+                android:layout_marginLeft="@dimen/list_toolbar_side_margin"
+                android:layout_marginRight="@dimen/list_toolbar_side_margin">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|start"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/logo" />
+
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/center_view"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/center_view"
+            android:layout_alignTop="@id/toolbar_container"
+            android:layout_marginEnd="@dimen/list_side_margin"
+            android:layout_marginRight="@dimen/list_side_margin"
+            android:layout_marginTop="20dp"
+            android:background="#fff"
+            android:elevation="10dp">
+
+            <fragment
+                android:id="@+id/view_pager_fragment"
+                android:name="com.example.xyzreader.ui.ViewPagerFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:twoPane="true"
+                tools:layout="@layout/fragment_article_detail" />
+        </FrameLayout>
+
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

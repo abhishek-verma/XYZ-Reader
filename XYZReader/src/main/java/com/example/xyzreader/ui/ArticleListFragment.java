@@ -12,6 +12,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -28,9 +30,19 @@ import com.example.xyzreader.data.UpdaterService;
 
 public class ArticleListFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
-    private OnFragmentInteractionListener mListener;
+    private ListFragmentCallbacksListener mListener;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
+    private boolean mIsRefreshing = false;
+    private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (UpdaterService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
+                mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
+                updateRefreshingUI();
+            }
+        }
+    };
 
     public ArticleListFragment() {
         // Required empty public constructor
@@ -66,11 +78,11 @@ public class ArticleListFragment extends Fragment implements
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof ListFragmentCallbacksListener) {
+            mListener = (ListFragmentCallbacksListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement ListFragmentCallbacksListener");
         }
     }
 
@@ -96,13 +108,29 @@ public class ArticleListFragment extends Fragment implements
                 new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(sglm);
 
+
+        if (cursor == null || !cursor.moveToFirst()) {
+            final CoordinatorLayout rootCoordinatorLayout = (CoordinatorLayout) getActivity().findViewById(R.id.root_coordinator_layout);
+
+
+            Snackbar snackbar = Snackbar
+                    .make(rootCoordinatorLayout, getString(R.string.offline_error), Snackbar.LENGTH_INDEFINITE)
+                    .setAction("RETRY", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            getLoaderManager().initLoader(0, null, ArticleListFragment.this);
+                        }
+                    });
+
+            snackbar.show();
+        }
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mRecyclerView.setAdapter(null);
     }
-
 
     @Override
     public void onStart() {
@@ -117,23 +145,37 @@ public class ArticleListFragment extends Fragment implements
         getActivity().unregisterReceiver(mRefreshingReceiver);
     }
 
-
-
-
-    private boolean mIsRefreshing = false;
-
-    private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (UpdaterService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
-                mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
-                updateRefreshingUI();
-            }
-        }
-    };
-
     private void updateRefreshingUI() {
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface ListFragmentCallbacksListener {
+        void onItemClicked(int pos, ViewHolder vh);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public CardView parentView;
+        public DynamicHeightNetworkImageView thumbnailView;
+        public TextView titleView;
+        public TextView subtitleView;
+
+        public ViewHolder(View view) {
+            super(view);
+            parentView = (CardView) view.findViewById(R.id.article_parent_card);
+            thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
+            titleView = (TextView) view.findViewById(R.id.article_title);
+            subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
+        }
     }
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
@@ -183,35 +225,6 @@ public class ArticleListFragment extends Fragment implements
         public int getItemCount() {
             return mCursor.getCount();
         }
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public CardView parentView;
-        public DynamicHeightNetworkImageView thumbnailView;
-        public TextView titleView;
-        public TextView subtitleView;
-
-        public ViewHolder(View view) {
-            super(view);
-            parentView = (CardView) view.findViewById(R.id.article_parent_card);
-            thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
-            titleView = (TextView) view.findViewById(R.id.article_title);
-            subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
-        }
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        void onItemClicked(int pos, ViewHolder vh);
     }
 
 

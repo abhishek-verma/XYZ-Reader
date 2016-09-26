@@ -8,5 +8,7 @@
     <string name="up">Up</string>
     <string name="action_refresh">Refresh</string>
 
+    <string name="offline_error">Cannot connect to Internet!</string>
+
 
 </resources>
