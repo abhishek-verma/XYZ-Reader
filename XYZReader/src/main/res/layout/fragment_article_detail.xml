@@ -133,17 +133,24 @@
     <!--android:elevation="@dimen/fab_elevation"-->
     <!--android:src="@drawable/ic_share"-->
     <!--android:stateListAnimator="@anim/fab_state_list_anim" />-->
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/share_fab"
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_share"
+        android:background="@android:color/transparent"
+        android:elevation="@dimen/fab_parent_elevation">
 
-        app:elevation="@dimen/fab_elevation"
-        app:fabSize="normal"
-        app:pressedTranslationZ="@dimen/fab_press_translation_z" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/share_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_share"
+
+            app:elevation="@dimen/fab_elevation"
+            app:fabSize="normal"
+            app:pressedTranslationZ="@dimen/fab_press_translation_z" />
+    </FrameLayout>
+
 
 </android.support.design.widget.CoordinatorLayout>

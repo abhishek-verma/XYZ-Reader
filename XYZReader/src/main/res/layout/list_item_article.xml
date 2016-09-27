@@ -29,10 +29,10 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="4"
-            android:paddingBottom="4dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="16dp"
+            android:paddingBottom="@dimen/article_title_padding_bottom"
+            android:paddingLeft="@dimen/article_title_padding"
+            android:paddingRight="@dimen/article_title_padding"
+            android:paddingTop="@dimen/article_title_padding"
             android:textColor="@color/ltgray" />
 
         <TextView
